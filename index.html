@@ -116,7 +116,7 @@
                      <h4>Current Live Chat Count (<span ng-bind="totalLiveDataCount" class="count"></span>)</h4>
                      <table class="table table-striped table-hover tableBox">
                         <tr>
-                           <th class="text-center">Sl.</th>
+                           <th class="text-center">Sl. No.</th>
                            <th ng-click="sortOrder('LiveChat', (sortLiveChatBy == 'projectName' ? '-projectName' : 'projectName'))" class="tableHead">Project Name &nbsp;<span ng-class="{'fas fa-arrow-down iconDown': sortLiveChatBy == 'projectName', 'fas fa-arrow-up iconUp': sortLiveChatBy == '-projectName'}"></span></th>
                            <th ng-click="sortOrder('LiveChat', (sortLiveChatBy == 'chatCount' ? '-chatCount' : 'chatCount'))" class="text-center tableHead">Total Count &nbsp;<span ng-class="{'fas fa-arrow-down iconDown': sortLiveChatBy == 'chatCount', 'fas fa-arrow-up iconUp': sortLiveChatBy == '-chatCount'}"></span></th>
                         </tr>
@@ -132,7 +132,7 @@
                      <h4>Total Chat Count Details (<span ng-bind="totalAggregatedDataCount" class="count"></span>)</h4>
                      <table class="table table-striped table-hover tableBox">
                         <tr>
-                           <th class="text-center">Sl.</th>
+                           <th class="text-center">Sl. No.</th>
                            <th ng-click="sortOrder('TotalChat', (sortTotalChatBy == 'projectName' ? '-projectName' : 'projectName'))" class="tableHead">Project Name &nbsp;<span ng-class="{'fas fa-arrow-down iconDown': sortTotalChatBy == 'projectName', 'fas fa-arrow-up iconUp': sortTotalChatBy == '-projectName'}"></span></th>
                            <th ng-click="sortOrder('TotalChat', (sortTotalChatBy == 'chatCount' ? '-chatCount' : 'chatCount'))" class="text-center tableHead">Total Count &nbsp;<span ng-class="{'fas fa-arrow-down iconDown': sortTotalChatBy == 'chatCount', 'fas fa-arrow-up iconUp': sortTotalChatBy == '-chatCount'}"></span></th>
                         </tr>
