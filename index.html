@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <!-- <meta http-equiv="refresh" content="10" /> -->
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+        <!-- font Awesome -->
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" integrity="sha384-gfdkjb5BdAXd+lj+gudLWI+BXq4IuLW5IT+brZEZsLFm++aCMlF1V92rMkPaX4PP" crossorigin="anonymous">
+        <!-- jQuery -->
+        <link rel="stylesheet" href="./jquery-ui.min.css">
+        <link rel="stylesheet" type="text/css" href="https://code.jquery.com/ui/1.9.1/themes/cupertino/jquery-ui.css" />
+        <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js" integrity="sha256-0YPKAwZP7Mp3ALMRVB2i8GXeEndvCq3eSl/WsAl1Ryk=" crossorigin="anonymous"></script>
+        
+        <!-- Bootstrap css cdn -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+        
+        <title>eServe Live Project Details</title>
+        <link rel="icon" type="image/png" href="eServeCloud_logo1.png">
+        <style>
+            *{
+                 margin:0;
+             }
+            body{
+                 background-color:rgb(238, 225, 230);
+                 /* background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfd2htcOBCiZIYdLpKqm5EKoey6zSfl3H7pVgw1uE5EEvM2m3Hnw');
+                 background-size: cover; */
+                 background-image: linear-gradient(to left, rgba(31, 31, 88), rgba(59, 68, 116, 0.9), rgba(31, 31, 88));
+                 border-top : 4px solid rgba(241, 91, 91, 0.9);
+                 line-height: 0.8;
+                 font-weight: 600;
+                 color: rgb(234, 234, 243);
+                 font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+                 }
+             body img{
+                 opacity: 0.5;
+             }    
+             .mainHeading{
+                 color: rgb(255, 255, 255);
+              }
+             .timeStamp, .count, .errMsg, .companyName, .iconDown{
+                  color: rgb(241, 91, 91);
+              }
+             .showTime{
+                  float: right;
+              }
+             .iconUp{
+                  color: rgb(21, 253, 0);
+              }
+             .tableHead{
+                  cursor: pointer;
+              }
+              tr :hover{
+                  transform: scale(1.1);
+                  transition: 500ms;
+              }
+              .maxChatCount{
+                  position: fixed;
+                  bottom: 50px;
+                  
+              }
+             .footer{
+                  width : 100%; 
+                  height : 45px;
+                  background-color: rgba(31, 31, 88, 0.3);
+                  position: fixed;
+                  left : 0;
+                  bottom :0;
+                  text-align: center;
+                  font-size: 12px;
+              }
+              @media screen and (max-width:600px){
+                  body{
+                     font-weight: 200;
+                  }
+                  .showTime{
+                      float: left;
+                      padding-top:10px;
+                  }
+                  .maxChatCount{
+                      position: relative;
+                      bottom: 0;
+                  }
+                  footer{
+                      position: static !important;
+                   }
+              }
+        </style>
+    </head>
+    <body>
+        <div ng-app="eServeApp" ng-controller="eServeCtrl" class="container mainDiv py-3">
+            <div>
+               <h2 class="text-center mainHeading">eServe Live Project Details</h2>
+            </div>
+            <hr style="background-color:rgb(188, 193, 221);">
+            <div class="row">
+               <div class="col-md-6">
+                   <div class="row">
+                       <div class="col-md-8">
+                            <span class="fas fa-calendar-check btn-primary"></span>&ensp;<input type="text" id="datePicker" ng-model="selectedDate"> &ensp;
+                            <button type="button" id="todayDate" class="btn btn-primary btn-sm" ng-click="fetchDashboardData()" onclick="datePicker.value=''"> Today </button>
+                       </div>
+                   </div>
+               </div>
+               <div class="col-md-6">
+                   <div class="showTime">
+                     <h6><span id="showTimeLable">Last Update On:</span><span ng-bind="lastUpdatedTime | date: 'dd-MM-yyyy, hh:mm a'" class="timeStamp"></span></h6>
+                   </div>
+               </div>
+            </div>
+            <div class="pt-4 mainBody">
+               <div class="row">
+                  <div class="col-md-6 col-sm-12">
+                     <h4>Current Live Chat Count (<span ng-bind="totalLiveDataCount" class="count"></span>)</h4>
+                     <table class="table table-striped table-hover tableBox">
+                        <tr>
+                           <th class="text-center">Sl.</th>
+                           <th ng-click="sortOrder('LiveChat', (sortLiveChatBy == 'projectName' ? '-projectName' : 'projectName'))" class="tableHead">Project Name &nbsp;<span ng-class="{'fas fa-arrow-down iconDown': sortLiveChatBy == 'projectName', 'fas fa-arrow-up iconUp': sortLiveChatBy == '-projectName'}"></span></th>
+                           <th ng-click="sortOrder('LiveChat', (sortLiveChatBy == 'chatCount' ? '-chatCount' : 'chatCount'))" class="text-center tableHead">Total Count &nbsp;<span ng-class="{'fas fa-arrow-down iconDown': sortLiveChatBy == 'chatCount', 'fas fa-arrow-up iconUp': sortLiveChatBy == '-chatCount'}"></span></th>
+                        </tr>
+                        <tr ng-repeat="x in newLiveData | orderBy: sortLiveChatBy">
+                           <td ng-bind="$index + 1" class="text-center"></td>
+                           <td ng-bind="x.projectName"></td>
+                           <td ng-bind="x.chatCount" class="text-center"></td>
+                        </tr>
+                     </table>
+                     <p class="errMsg"></p>
+                  </div>
+                  <div class="col-md-6 col-sm-12">
+                     <h4>Total Chat Count Details (<span ng-bind="totalAggregatedDataCount" class="count"></span>)</h4>
+                     <table class="table table-striped table-hover tableBox">
+                        <tr>
+                           <th class="text-center">Sl.</th>
+                           <th ng-click="sortOrder('TotalChat', (sortTotalChatBy == 'projectName' ? '-projectName' : 'projectName'))" class="tableHead">Project Name &nbsp;<span ng-class="{'fas fa-arrow-down iconDown': sortTotalChatBy == 'projectName', 'fas fa-arrow-up iconUp': sortTotalChatBy == '-projectName'}"></span></th>
+                           <th ng-click="sortOrder('TotalChat', (sortTotalChatBy == 'chatCount' ? '-chatCount' : 'chatCount'))" class="text-center tableHead">Total Count &nbsp;<span ng-class="{'fas fa-arrow-down iconDown': sortTotalChatBy == 'chatCount', 'fas fa-arrow-up iconUp': sortTotalChatBy == '-chatCount'}"></span></th>
+                        </tr>
+                        <tr ng-repeat="x in newAggregatedData | orderBy: sortTotalChatBy">
+                           <td ng-bind="$index + 1" class="text-center"></td>
+                           <td ng-bind="x.projectName"></td>
+                           <td ng-bind="x.chatCount" class="text-center"></td>
+                        </tr>
+                     </table>
+                     <p class="errMsg"></p>
+                  </div>
+               </div>
+            </div>
+            
+        </div>
+        <footer class="footer py-3">
+                Copyright &copy; <span class="companyName"><strong>eServeCloud</strong></span> 2019. All Rights Reserved.
+        </footer>
+<script>
+  var app = angular.module("eServeApp",[]);
+  app.controller("eServeCtrl",function($http,$scope){
+    $scope.lastUpdatedTime = null;
+    $scope.liveData = [];
+    $scope.newLiveData = [];
+    $scope.totalLiveDataCount = 0;
+    $scope.aggregatedData = [];
+    $scope.newAggregatedData = [];
+    $scope.totalAggregatedDataCount = 0;
+    $scope.intervalRef = null;
+    $scope.sortLiveChatBy = null;
+    $scope.sortTotalChatBy = null;
+    $scope.selectedDate = null;
+    $scope.maxAggregateData = 0;
+    
+    // get method call to fetchLiveData
+    $scope.fetchLiveData = function fetchLiveData() { 
+        try{
+            $http({
+                method : "GET",
+                url : "https://www.eservecloud.com/api/eserve-ds-rest/rest/console/chats/live/1000C2ACA7F84105B9CF70FAC03C94C9E2EE10D30FD94FBA8E8B2A518BEE1A32",
+            }).then(function success(response){
+                if(response.data) {
+                    $scope.liveData = response.data;
+                    
+                    // create new array using map fn to set propertyName(key)-to-value
+                    $scope.newLiveData = $scope.liveData.map(setPropertyName => ({ "projectName":setPropertyName[0], "chatCount":setPropertyName[1]}));
+                
+                    $scope.totalLiveDataCount = 0;
+                    for(let i = 0; i < $scope.liveData.length; i++) 
+                        $scope.totalLiveDataCount += $scope.liveData[i][1];
+                } else {
+                    $scope.totalLiveDataCount = 0;
+                    $scope.newLiveData = [];
+                }
+            }, function error(response){
+                $scope.errMsg = "Note : Something went wrong! Try Again ";
+            });
+        } catch(err){
+            console.log("Error occurred in fetchLiveData -- " + err);
+        }    
+    };
+    
+    // get method to fetchAgrregatedData
+    $scope.fetchAgrregatedData = function fetchAgrregatedData(selectedDate) { 
+        try {
+            $http({
+                method : "GET",
+                url : "https://www.eservecloud.com/api/eserve-ds-rest/rest/console/chats/total/1000C2ACA7F84105B9CF70FAC03C94C9E2EE10D30FD94FBA8E8B2A518BEE1A32" + ((selectedDate) ? ('/' + selectedDate) : ''),
+            }).then(function success(response){
+                if(response.data) {
+                    $scope.aggregatedData = response.data;
+                    
+                    // create new array using map fn to set propertyName-key
+                    $scope.newAggregatedData = $scope.aggregatedData.map(setPropertyName => ({ "projectName":setPropertyName[0], "chatCount":setPropertyName[1]}));
+                    
+                    $scope.totalAggregatedDataCount = 0;
+                    for(let i = 0; i < $scope.aggregatedData.length; i++) {
+                        $scope.totalAggregatedDataCount += $scope.aggregatedData[i][1];
+                    }
+                } else {
+                    $scope.totalAggregatedDataCount = 0;
+                    $scope.newAggregatedData = [];
+                }
+            }, function error(response){
+                $scope.errMsg = "Note : Something went wrong! Try Again ";
+            });
+        } catch(err){
+            console.log("Error occurred in fetchAgrregatedData -- " + err);
+        }
+    }
+
+    // jquery datepicker code goes here....
+    $("#datePicker").datepicker({
+        dateFormat : 'yy-mm-dd',
+        onSelect : function(selectedDate){
+            $scope.fetchDataByDate(new Date(selectedDate));
+        }
+    });
+       
+    // method to fetchdata by particular Date ------------
+    $scope.fetchDataByDate = function fetchDataByDate(selectedDate) {
+        try{
+            if(!selectedDate){
+                $scope.errMsg = "This is not valid date! Enter valid date";
+            } else {
+                $scope.fetchPrevAgrregateData(selectedDate.getFullYear() + "-" + (selectedDate.getMonth()+1) + "-" + selectedDate.getDate());
+                $scope.totalLiveDataCount = 0;
+                $scope.newLiveData = [];
+            }
+        } catch(err) {
+            console.log("Error occurred in fetchDataByDate -- " + err);
+        }
+    }
+    
+   //sort table data in Ascending / Descending Order
+   $scope.sortOrder = function sortOrder(tableName, sortBy) {
+        try{
+            if (tableName == 'LiveChat') {
+                $scope.sortLiveChatBy = sortBy;
+            } else if (tableName == 'TotalChat') {
+                $scope.sortTotalChatBy = sortBy;
+            }
+        } catch(err) {
+            console.log("Erroe occured while sortOrder!----" + err);
+        }
+    };
+    
+    // timeStamp fn 
+    $scope.lastUpdatedOn = function lastUpdatedOn(selectedDate) {
+        try{
+            if(selectedDate){
+                $scope.lastUpdatedTime = new Date(selectedDate);
+                document.getElementById("showTimeLable").innerHTML = "Showing Data For : ";
+            }else{
+                $scope.lastUpdatedTime = new Date();
+                document.getElementById("showTimeLable").innerHTML = "Last Update On : ";
+            }
+        } catch(err) {
+            console.log("Error occured while showing lastUpdatedOn-------" + err);
+            $scope.lastUpdatedTime = null;
+        }
+    }
+    
+    //  refresh all data every 5 min
+    $scope.initInterval = function initInterval(selectedDate) {
+        try {
+            $scope.intervalRef = window.setInterval(function(){
+                $scope.fetchDashboardData(selectedDate);
+            }, 1000*60*5);
+        } catch(err){
+            console.log("Error occurred in initInterval -- " + err);
+            clearInterval($scope.intervalRef);
+        }
+    };
+    
+    // call all fn/method in fetchDashboardData
+    $scope.fetchDashboardData = function fetchDashboardData(selectedDate) { 
+        $scope.lastUpdatedOn(selectedDate);
+        $scope.fetchLiveData(); // Invoking to get live counts
+        $scope.fetchAgrregatedData(selectedDate); // Invoking to get aggregated counts
+    }
+    $scope.fetchPrevAgrregateData = function fetchPrevAgrregateData(selectedDate) {
+        $scope.lastUpdatedOn(selectedDate);
+        $scope.fetchAgrregatedData(selectedDate); // Invoking to get aggregated counts
+    }
+
+    $scope.fetchDashboardData();
+    $scope.initInterval();
+});
+</script>
+</body>
+</html>
