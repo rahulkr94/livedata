@@ -297,14 +297,10 @@
     $scope.fetchPrevAgrregateData = function fetchPrevAgrregateData(selectedDate) {
         $scope.lastUpdatedOn(selectedDate);
         $scope.fetchAgrregatedData(selectedDate); // Invoking to get aggregated counts
-    };
+    }
 
-    var initLiveChatCount = function initLiveChatCount() {
-        $scope.fetchDashboardData();
-        $scope.initInterval();
-    };
-
-    
+    $scope.fetchDashboardData();
+    $scope.initInterval();
 });
 </script>
 </body>
