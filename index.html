@@ -33,7 +33,7 @@
                  color: rgb(234, 234, 243);
                  font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
                  }
-/*              body img{
+           /* body img{
                  opacity: 0.5;
              } */
              .mainHeading{
@@ -297,10 +297,14 @@
     $scope.fetchPrevAgrregateData = function fetchPrevAgrregateData(selectedDate) {
         $scope.lastUpdatedOn(selectedDate);
         $scope.fetchAgrregatedData(selectedDate); // Invoking to get aggregated counts
-    }
+    };
 
-    $scope.fetchDashboardData();
-    $scope.initInterval();
+    var initLiveChatCount = function initLiveChatCount() {
+        $scope.fetchDashboardData();
+        $scope.initInterval();
+    };
+
+    
 });
 </script>
 </body>
