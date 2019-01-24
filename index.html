@@ -299,8 +299,12 @@
         $scope.fetchAgrregatedData(selectedDate); // Invoking to get aggregated counts
     }
 
-    $scope.fetchDashboardData();
-    $scope.initInterval();
+    var initLiveChatCount = function initLiveChatCount() {
+        $scope.fetchDashboardData();
+        $scope.initInterval();
+    }
+    initLiveChatCount();
+  
 });
 </script>
 </body>
