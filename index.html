@@ -22,8 +22,8 @@
                  margin:0;
              }
             body{
-                 background-color: rgb(31, 31, 88);
-                 background-image: linear-gradient(to left, rgba(31, 31, 88), rgba(59, 68, 116, 0.9), rgba(31, 31, 88));
+                 background-color: rgba(31, 31, 88, 0.9);
+                 background-image: linear-gradient(to left, rgba(31, 31, 88), rgb(40, 40, 102), rgba(59, 68, 116, 0.9), rgb(40, 40, 102), rgba(31, 31, 88));
                  border-top : 4px solid rgba(241, 91, 91, 0.9);
                  line-height: 0.8;
                  font-weight: 600;
@@ -56,6 +56,10 @@
                   position: fixed;
                   bottom: 50px;
                   
+              }
+              .errMsg{
+                text-align:center;
+                margin-top:20px ;
               }
              .footer{
                   width : 100%; 
@@ -114,8 +118,8 @@
                      <table class="table table-striped table-hover tableBox">
                         <tr>
                            <th class="text-center">Sl. No.</th>
-                           <th ng-click="sortOrder('LiveChat', (sortLiveChatBy == 'projectName' ? '-projectName' : 'projectName'))" class="tableHead">Project Name &nbsp;<span ng-class="{'fas fa-arrow-down iconDown': sortLiveChatBy == 'projectName', 'fas fa-arrow-up iconUp': sortLiveChatBy == '-projectName'}"></span></th>
-                           <th ng-click="sortOrder('LiveChat', (sortLiveChatBy == 'chatCount' ? '-chatCount' : 'chatCount'))" class="text-center tableHead">Total Count &nbsp;<span ng-class="{'fas fa-arrow-down iconDown': sortLiveChatBy == 'chatCount', 'fas fa-arrow-up iconUp': sortLiveChatBy == '-chatCount'}"></span></th>
+                           <th ng-click="sortOrder('LiveChatCountTable', (sortLiveChatBy == 'projectName' ? '-projectName' : 'projectName'))" class="tableHead">Project Name &nbsp;<span ng-class="{'fas fa-arrow-down iconDown': sortLiveChatBy == 'projectName', 'fas fa-arrow-up iconUp': sortLiveChatBy == '-projectName'}"></span></th>
+                           <th ng-click="sortOrder('LiveChatCountTable', (sortLiveChatBy == 'chatCount' ? '-chatCount' : 'chatCount'))" class="text-center tableHead">Total Count &nbsp;<span ng-class="{'fas fa-arrow-down iconDown': sortLiveChatBy == 'chatCount', 'fas fa-arrow-up iconUp': sortLiveChatBy == '-chatCount'}"></span></th>
                         </tr>
                         <tr ng-repeat="x in newLiveData | orderBy: sortLiveChatBy">
                            <td ng-bind="$index + 1" class="text-center"></td>
@@ -130,8 +134,8 @@
                      <table class="table table-striped table-hover tableBox">
                         <tr>
                            <th class="text-center">Sl. No.</th>
-                           <th ng-click="sortOrder('TotalChat', (sortTotalChatBy == 'projectName' ? '-projectName' : 'projectName'))" class="tableHead">Project Name &nbsp;<span ng-class="{'fas fa-arrow-down iconDown': sortTotalChatBy == 'projectName', 'fas fa-arrow-up iconUp': sortTotalChatBy == '-projectName'}"></span></th>
-                           <th ng-click="sortOrder('TotalChat', (sortTotalChatBy == 'chatCount' ? '-chatCount' : 'chatCount'))" class="text-center tableHead">Total Count &nbsp;<span ng-class="{'fas fa-arrow-down iconDown': sortTotalChatBy == 'chatCount', 'fas fa-arrow-up iconUp': sortTotalChatBy == '-chatCount'}"></span></th>
+                           <th ng-click="sortOrder('TotalChatCountTable', (sortTotalChatBy == 'projectName' ? '-projectName' : 'projectName'))" class="tableHead">Project Name &nbsp;<span ng-class="{'fas fa-arrow-down iconDown': sortTotalChatBy == 'projectName', 'fas fa-arrow-up iconUp': sortTotalChatBy == '-projectName'}"></span></th>
+                           <th ng-click="sortOrder('TotalChatCountTable', (sortTotalChatBy == 'chatCount' ? '-chatCount' : 'chatCount'))" class="text-center tableHead">Total Count &nbsp;<span ng-class="{'fas fa-arrow-down iconDown': sortTotalChatBy == 'chatCount', 'fas fa-arrow-up iconUp': sortTotalChatBy == '-chatCount'}"></span></th>
                         </tr>
                         <tr ng-repeat="x in newAggregatedData | orderBy: sortTotalChatBy">
                            <td ng-bind="$index + 1" class="text-center"></td>
@@ -139,11 +143,10 @@
                            <td ng-bind="x.chatCount" class="text-center"></td>
                         </tr>
                      </table>
-                     <p class="errMsg"></p>
                   </div>
                </div>
+               <h4><p class="errMsg" id="errMsg" ng-bind="errMsg"></p></h4>
             </div>
-            
         </div>
         <footer class="footer py-3">
                 Copyright &copy; <span class="companyName"><strong>eServeCloud</strong></span> 2019. All Rights Reserved.
@@ -232,25 +235,24 @@
     // method to fetchdata by particular Date ------------
     $scope.fetchDataByDate = function fetchDataByDate(selectedDate) {
         try{
-            if(!selectedDate){
-                $scope.errMsg = "This is not valid date! Enter valid date";
-            } else {
-                $scope.fetchPrevAgrregateData(selectedDate.getFullYear() + "-" + (selectedDate.getMonth()+1) + "-" + selectedDate.getDate());
+            let todayDate = new Date();
+            ( selectedDate.getDate() > todayDate.getDate()) ? document.getElementById("errMsg").innerHTML = "Note : Please select today or earlier date." : document.getElementById("errMsg").innerHTML = "" ;
+            
+            ( selectedDate.getDate() === todayDate.getDate() ) ? $scope.fetchDashboardData() : $scope.fetchPrevAgrregateData(selectedDate.getFullYear() + "-" + (selectedDate.getMonth()+1) + "-" + selectedDate.getDate());
                 $scope.totalLiveDataCount = 0;
                 $scope.newLiveData = [];
-            }
         } catch(err) {
             console.log("Error occurred in fetchDataByDate -- " + err);
         }
     }
     
    //sort table data in Ascending / Descending Order
-   $scope.sortOrder = function sortOrder(tableName, sortBy) {
+   $scope.sortOrder = function sortOrder(tableName, sortLiveChatBy) {
         try{
-            if (tableName == 'LiveChat') {
-                $scope.sortLiveChatBy = sortBy;
-            } else if (tableName == 'TotalChat') {
-                $scope.sortTotalChatBy = sortBy;
+            if (tableName == 'LiveChatCountTable') {
+                $scope.sortLiveChatBy = sortLiveChatBy;
+            } else if (tableName == 'TotalChatCountTable') {
+                $scope.sortTotalChatBy = sortLiveChatBy;
             }
         } catch(err) {
             console.log("Erroe occured while sortOrder!----" + err);
@@ -290,6 +292,7 @@
         $scope.lastUpdatedOn(selectedDate);
         $scope.fetchLiveData(); // Invoking to get live counts
         $scope.fetchAgrregatedData(selectedDate); // Invoking to get aggregated counts
+        document.getElementById("errMsg").innerHTML = "";
     }
     $scope.fetchPrevAgrregateData = function fetchPrevAgrregateData(selectedDate) {
         $scope.lastUpdatedOn(selectedDate);
